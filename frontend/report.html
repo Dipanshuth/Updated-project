@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FIR Report Viewer — View and download AI-generated First Information Reports.">
+  <title>FIR Report — AI Digital Memory Vault</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="main-navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🛡️</div>
+      <span>Memory Vault</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" id="nav-home">🏠 Home</a></li>
+      <li><a href="dashboard.html" id="nav-dashboard">📊 Dashboard</a></li>
+      <li><a href="upload.html" id="nav-upload">📤 Upload</a></li>
+      <li><a href="incident.html" id="nav-incident">🔍 Incidents</a></li>
+      <li><a href="report.html" class="active" id="nav-report">📄 Reports</a></li>
+    </ul>
+    <div class="nav-status">
+      <div class="status-dot"></div>
+      <span>System Active</span>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <div class="page-header flex-between">
+      <div>
+        <h1>📄 FIR Report Viewer</h1>
+        <p>First Information Report — Auto-generated from AI analysis</p>
+      </div>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="btn btn-primary" id="btn-download-pdf">📥 Download as PDF</button>
+        <button class="btn btn-secondary" id="btn-print-report" onclick="window.print()">🖨️ Print</button>
+      </div>
+    </div>
+
+    <!-- Report Status -->
+    <div class="card mb-3" id="report-status-card" style="display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;">
+      <span class="badge badge-success" style="font-size:0.85rem;padding:0.4rem 1rem;">✓ Generated</span>
+      <span style="font-size:0.9rem;">Report generated on <strong>16 April 2026, 14:34 IST</strong> — Based on Evidence #EVD-005</span>
+      <span style="margin-left:auto;">
+        <span class="badge badge-teal">🔐 Hash Verified</span>
+      </span>
+    </div>
+
+    <!-- FIR Document -->
+    <div class="fir-document" id="fir-document">
+
+      <h1>FIRST INFORMATION REPORT (FIR)</h1>
+
+      <p style="text-align:center;font-size:0.85rem;color:#666;margin-top:-1rem;margin-bottom:2rem;">
+        Under Section 154 Cr.P.C. — AI Digital Memory Vault System
+      </p>
+
+      <h2>I. GENERAL INFORMATION</h2>
+      <table>
+        <tr>
+          <th>FIR Number</th>
+          <td id="fir-number">FIR/2026/NCR/00847</td>
+        </tr>
+        <tr>
+          <th>Date & Time of Report</th>
+          <td id="fir-datetime">16 April 2026, 14:34:02 IST</td>
+        </tr>
+        <tr>
+          <th>Police Station</th>
+          <td id="fir-station">Connaught Place PS, New Delhi</td>
+        </tr>
+        <tr>
+          <th>District</th>
+          <td id="fir-district">New Delhi</td>
+        </tr>
+        <tr>
+          <th>Evidence Reference</th>
+          <td id="fir-evidence-ref">EVD-005</td>
+        </tr>
+      </table>
+
+      <h2>II. INCIDENT DETAILS</h2>
+      <table>
+        <tr>
+          <th>Date & Time of Incident</th>
+          <td id="fir-incident-datetime">16 April 2026, approximately 14:28 IST</td>
+        </tr>
+        <tr>
+          <th>Place of Occurrence</th>
+          <td id="fir-incident-location">Near Block A, Connaught Place, New Delhi — GPS: 28.6139°N, 77.2090°E</td>
+        </tr>
+        <tr>
+          <th>Type of Incident</th>
+          <td id="fir-incident-type">Physical Altercation / Threat</td>
+        </tr>
+        <tr>
+          <th>AI Distress Confidence</th>
+          <td id="fir-distress" style="color:#c0392b;font-weight:bold;">87% — HIGH</td>
+        </tr>
+      </table>
+
+      <h2>III. COMPLAINANT INFORMATION</h2>
+      <table>
+        <tr>
+          <th>Name</th>
+          <td id="fir-complainant-name">Civilian User (Anonymous Submission)</td>
+        </tr>
+        <tr>
+          <th>Contact</th>
+          <td id="fir-complainant-contact">Via AI Memory Vault Platform</td>
+        </tr>
+        <tr>
+          <th>Submission Method</th>
+          <td>Browser Audio Recording + GPS</td>
+        </tr>
+      </table>
+
+      <h2>IV. NARRATION OF FACTS</h2>
+      <p style="text-align:justify;margin:1rem 0;font-size:0.95rem;" id="fir-narration">
+        On 16 April 2026, at approximately 14:28 IST, the complainant recorded audio evidence
+        using the AI Digital Memory Vault platform near Block A, Connaught Place, New Delhi.
+        The audio recording, lasting 3 minutes and 24 seconds, was automatically analyzed by
+        the system's AI engine.
+      </p>
+      <p style="text-align:justify;margin:1rem 0;font-size:0.95rem;">
+        AI analysis detected elevated vocal stress patterns with an 87% distress confidence score.
+        Multiple distress keywords were identified including "help", "stop", "scared", and "please".
+        The recording captures what appears to be a confrontational situation beginning at the 01:42
+        mark of the audio. Voice stress analysis indicates the subject experienced significant fear or
+        threat during the recorded period.
+      </p>
+      <p style="text-align:justify;margin:1rem 0;font-size:0.95rem;">
+        The evidence was automatically hashed using SHA-256 (hash: a7f3c8e2b1d4f6a9c3e5b7d9f1a3c5e7b9d1f3a5c7e9b1d3f5a7c9e1b3d5f7)
+        and anchored for tamper-proof verification at block #48291 on 16 April 2026 at 14:32:15 UTC.
+      </p>
+
+      <h2>V. AI-GENERATED TIMELINE</h2>
+      <table>
+        <tr>
+          <th>Time</th>
+          <th>Event</th>
+        </tr>
+        <tr>
+          <td>14:28:00</td>
+          <td>Recording initiated by complainant</td>
+        </tr>
+        <tr>
+          <td>14:28:15</td>
+          <td>Background voices detected — ambient environment sounds</td>
+        </tr>
+        <tr>
+          <td>14:29:42</td>
+          <td>Elevated vocal stress detected — confrontational interaction begins</td>
+        </tr>
+        <tr>
+          <td>14:30:05</td>
+          <td>Distress keywords identified: "help", "stop"</td>
+        </tr>
+        <tr>
+          <td>14:30:48</td>
+          <td>Peak distress level recorded (87% confidence)</td>
+        </tr>
+        <tr>
+          <td>14:31:24</td>
+          <td>Recording concluded</td>
+        </tr>
+      </table>
+
+      <h2>VI. EVIDENCE INTEGRITY</h2>
+      <table>
+        <tr>
+          <th>SHA-256 Hash</th>
+          <td style="font-family:monospace;font-size:0.8rem;word-break:break-all;">a7f3c8e2b1d4f6a9c3e5b7d9f1a3c5e7b9d1f3a5c7e9b1d3f5a7c9e1b3d5f7</td>
+        </tr>
+        <tr>
+          <th>Blockchain Anchor</th>
+          <td>Block #48291 — 16 April 2026, 14:32:15 UTC</td>
+        </tr>
+        <tr>
+          <th>Integrity Status</th>
+          <td style="color:#27ae60;font-weight:bold;">✓ VERIFIED — No Tampering Detected</td>
+        </tr>
+      </table>
+
+      <h2>VII. ACTION RECOMMENDED</h2>
+      <p style="text-align:justify;margin:1rem 0;font-size:0.95rem;">
+        Based on the AI analysis indicating HIGH distress levels (87% confidence), it is recommended that:
+      </p>
+      <ol style="margin:1rem 0 1rem 1.5rem;font-size:0.95rem;">
+        <li>Immediate dispatch of nearest patrol unit to GPS coordinates 28.6139°N, 77.2090°E</li>
+        <li>Interview of the complainant for additional details</li>
+        <li>Preservation of the original audio evidence (hash-verified copy available)</li>
+        <li>Initiation of investigation under applicable sections</li>
+      </ol>
+
+      <!-- Signatures -->
+      <div class="signature-block" style="margin-top:4rem;">
+        <div class="signature-line">
+          Reporting Officer
+        </div>
+        <div class="signature-line">
+          Station House Officer
+        </div>
+      </div>
+
+      <p style="text-align:center;font-size:0.75rem;color:#999;margin-top:3rem;border-top:1px solid #ddd;padding-top:1rem;">
+        This FIR was auto-generated by AI Digital Memory Vault v1.0 — Hackathon 2026<br>
+        Generated on 16 April 2026 at 14:34:02 IST | Evidence Ref: EVD-005
+      </p>
+
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 AI Digital Memory Vault — Hackathon Project | Built for Justice</p>
+  </footer>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById('btn-download-pdf').addEventListener('click', () => {
+      showToast('PDF download will be available when connected to backend.', 'info');
+    });
+
+    // Dynamic fetch from the backend
+    document.addEventListener('DOMContentLoaded', async () => {
+      const evidenceId = new URLSearchParams(window.location.search).get('id');
+      if (!evidenceId) return;
+
+      try {
+        // Fetch pipeline report
+        const res = await fetch(`http://localhost:8000/generate-report?evidence_id=${evidenceId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.report) {
+            document.getElementById('fir-evidence-ref').innerText = evidenceId;
+            document.getElementById('fir-number').innerText = data.report.fir_number;
+            document.getElementById('fir-datetime').innerText = new Date(data.report.generated_at).toLocaleString();
+            document.getElementById('fir-incident-datetime').innerText = data.report.incident_time ? new Date(data.report.incident_time).toLocaleString() : 'Not specified';
+            if (data.report.location_details) {
+              document.getElementById('fir-incident-location').innerText = data.report.location_details.address + ' — GPS: ' + data.report.location_details.coordinates;
+            }
+            document.getElementById('fir-narration').innerText = data.report.summary;
+            if (data.report.evidence_reference) {
+              const hashCell = document.querySelector('td[style*="break-all"]');
+              if (hashCell) hashCell.innerText = data.report.evidence_reference.sha256_hash;
+            }
+          }
+        }
+
+        // Also fetch evidence report for distress details
+        const evRes = await fetch(`http://localhost:8000/evidence/${evidenceId}/report`);
+        if (evRes.ok) {
+          const evData = await evRes.json();
+          const distressEl = document.getElementById('fir-distress');
+          if (distressEl && evData.distress_confidence) {
+            const level = evData.distress_level || 'Unknown';
+            distressEl.textContent = `${evData.distress_confidence} — ${level}`;
+            // Color based on level
+            if (level === 'Critical' || level === 'High') {
+              distressEl.style.color = '#c0392b';
+            } else if (level === 'Medium') {
+              distressEl.style.color = '#e67e22';
+            } else {
+              distressEl.style.color = '#27ae60';
+            }
+          }
+          // Update FIR evidence ref
+          document.getElementById('fir-evidence-ref').innerText = evidenceId;
+          // Update narration if not already set
+          if (evData.narration && evData.narration !== 'AI analysis pending.') {
+            document.getElementById('fir-narration').innerText = evData.narration;
+          }
+          // Update hash
+          if (evData.hash) {
+            const hashCell = document.querySelector('td[style*="break-all"]');
+            if (hashCell) hashCell.innerText = evData.hash;
+          }
+          // Update report status line
+          const statusCard = document.getElementById('report-status-card');
+          if (statusCard) {
+            statusCard.querySelector('span:nth-child(2)').innerHTML = 
+              `Report generated on <strong>${new Date().toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}</strong> — Based on Evidence #${evidenceId}`;
+          }
+          // Update footer
+          const footerP = document.querySelector('.fir-document p[style*="999"]');
+          if (footerP) {
+            footerP.innerHTML = `This FIR was auto-generated by AI Digital Memory Vault v1.0 — Analysis 2026<br>Generated on ${new Date().toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})} | Evidence Ref: ${evidenceId}`;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch dynamic report, using demo visuals.', err);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Active Protection — AI Digital Memory Vault</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+  <style>
+    .protection-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+      text-align: center;
+    }
+    .status-circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: rgba(0, 201, 177, 0.1);
+      border: 4px solid var(--teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      transition: all 0.5s ease;
+      position: relative;
+    }
+    .status-circle.pulsing {
+      animation: pulse-ring 2s infinite;
+    }
+    .status-circle.recording {
+      border-color: var(--danger);
+      background: rgba(255, 71, 87, 0.1);
+    }
+    .status-circle.processing {
+      border-color: var(--warning);
+      background: rgba(255, 165, 2, 0.1);
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(0, 201, 177, 0.4); }
+      70% { box-shadow: 0 0 0 20px rgba(0, 201, 177, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 201, 177, 0); }
+    }
+    .demo-controls {
+      margin-top: 3rem;
+      padding: 1.5rem;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px dashed var(--border-color);
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .pipeline-step {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      text-align: left;
+    }
+    .pipeline-step.active {
+      color: var(--text-light);
+      font-weight: bold;
+    }
+    .pipeline-step.completed {
+      color: var(--success);
+    }
+    .step-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+
+    /* Results Panel */
+    .results-panel {
+      width: 100%;
+      max-width: 500px;
+      margin: 2rem auto 0;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      text-align: left;
+      animation: fadeInUp 0.5s ease;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .results-panel h3 {
+      text-align: center;
+      margin-bottom: 1.2rem;
+      font-size: 1.15rem;
+    }
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.92rem;
+    }
+    .result-row:last-child {
+      border-bottom: none;
+    }
+    .result-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .result-value {
+      font-weight: 700;
+    }
+    .result-value.low { color: var(--success); }
+    .result-value.medium { color: var(--warning); }
+    .result-value.high { color: var(--danger); }
+
+    .confidence-bar-container {
+      width: 100%;
+      height: 10px;
+      background: var(--bg-input);
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 0.5rem 0 1rem;
+    }
+    .confidence-bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 1.2s ease;
+    }
+    .result-message {
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin: 1rem 0;
+    }
+    .result-message.low { background: rgba(0, 201, 177, 0.1); border: 1px solid rgba(0, 201, 177, 0.3); color: var(--success); }
+    .result-message.medium { background: rgba(255, 165, 2, 0.1); border: 1px solid rgba(255, 165, 2, 0.3); color: var(--warning); }
+    .result-message.high { background: rgba(255, 71, 87, 0.1); border: 1px solid rgba(255, 71, 87, 0.3); color: var(--danger); }
+
+    .results-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="main-navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🛡️</div>
+      <span>Memory Vault</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+    </ul>
+    <div class="nav-status" id="nav-mode-indicator">
+      <div class="status-dot"></div>
+      <span>System Active</span>
+    </div>
+  </nav>
+
+  <main class="main-content protection-container">
+
+    <div class="status-circle pulsing" id="status-visual">
+      🛡️
+    </div>
+
+    <h1 id="status-title">Protection Active</h1>
+    <p id="status-subtitle" style="color:var(--text-muted); max-width:400px; margin-bottom: 2rem;">
+      The system is monitoring for distress signals via microphone and sensors.
+    </p>
+
+    <!-- Pipeline UI (Hidden by default) -->
+    <div id="pipeline-ui" style="display:none; width:100%; max-width:400px; margin: 0 auto 2rem auto; background: var(--surface); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+      <h3 style="text-align:left; margin-bottom:1rem; font-size:1.1rem;">Live AI Pipeline</h3>
+      <div class="pipeline-step" id="step-detect">
+        <div class="step-icon">1</div>
+        <span>Detecting Distress...</span>
+      </div>
+      <div class="pipeline-step" id="step-record">
+        <div class="step-icon">2</div>
+        <span>Recording Evidence...</span>
+      </div>
+      <div class="pipeline-step" id="step-upload">
+        <div class="step-icon">3</div>
+        <span>Secure Upload & Hashing...</span>
+      </div>
+      <div class="pipeline-step" id="step-analyze">
+        <div class="step-icon">4</div>
+        <span>AI Audio Analysis...</span>
+      </div>
+      <div class="pipeline-step" id="step-infer">
+        <div class="step-icon">5</div>
+        <span>AI Inference & Timeline...</span>
+      </div>
+      <div class="pipeline-step" id="step-report">
+        <div class="step-icon">6</div>
+        <span>Generating FIR Report...</span>
+      </div>
+    </div>
+
+    <!-- Results Panel (Hidden by default, shown after pipeline completes) -->
+    <div id="results-panel" class="results-panel" style="display:none;">
+      <h3>📊 Analysis Results</h3>
+      
+      <div class="result-row">
+        <span class="result-label">Evidence ID</span>
+        <span class="result-value" id="result-evidence-id" style="color:var(--teal); font-family:var(--font-mono);">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Distress Level</span>
+        <span class="result-value" id="result-distress-level">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Confidence</span>
+        <span class="result-value" id="result-confidence">—</span>
+      </div>
+      
+      <div class="confidence-bar-container">
+        <div class="confidence-bar-fill" id="result-confidence-bar" style="width:0%;"></div>
+      </div>
+
+      <div class="result-row">
+        <span class="result-label">Distress Detected</span>
+        <span class="result-value" id="result-detected">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Status</span>
+        <span class="result-value" id="result-status" style="color:var(--success);">—</span>
+      </div>
+
+      <div class="result-message" id="result-message">—</div>
+
+      <div class="results-actions">
+        <a href="#" class="btn btn-primary" id="btn-view-report">📄 View Report</a>
+        <a href="#" class="btn btn-secondary" id="btn-view-incident">🔍 View Incident</a>
+        <button class="btn btn-secondary" id="btn-new-demo" onclick="resetDemo()">🔄 New Test</button>
+      </div>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="demo-controls" id="demo-controls">
+      <h3>🧪 Demo Mode</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+        Trigger the full end-to-end AI pipeline simulation. Ensure backend is running.
+      </p>
+      
+      <div style="display:flex; justify-content:center; gap: 1rem;">
+        <button class="btn btn-primary" id="btn-trigger-demo" onclick="startDemoPipeline()">
+          🚨 Simulate Trigger
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 AI Digital Memory Vault</p>
+  </footer>
+
+  <script src="js/protection.js"></script>
+</body>
+</html>

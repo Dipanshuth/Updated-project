@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Incident Detail — View evidence metadata, SHA-256 hash, AI analysis timeline, and audio player.">
+  <title>Incident Detail — AI Digital Memory Vault</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="main-navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🛡️</div>
+      <span>Memory Vault</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" id="nav-home">🏠 Home</a></li>
+      <li><a href="dashboard.html" id="nav-dashboard">📊 Dashboard</a></li>
+      <li><a href="upload.html" id="nav-upload">📤 Upload</a></li>
+      <li><a href="incident.html" class="active" id="nav-incident">🔍 Incidents</a></li>
+      <li><a href="report.html" id="nav-report">📄 Reports</a></li>
+    </ul>
+    <div class="nav-status">
+      <div class="status-dot"></div>
+      <span>System Active</span>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <div class="page-header flex-between">
+      <div>
+        <h1>🔍 Incident Detail</h1>
+        <p>Evidence ID: <span class="text-teal" id="evidence-id-display" style="font-family:var(--font-mono);font-weight:600;">Loading...</span></p>
+      </div>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="btn btn-primary" id="btn-analyze-ai">🧠 Analyze with AI</button>
+        <a href="report.html" class="btn btn-secondary" id="btn-generate-fir">📄 Generate FIR</a>
+      </div>
+    </div>
+
+    <!-- Metadata Card -->
+    <div class="card mb-3" id="metadata-card">
+      <div class="card-header">
+        <h2>📋 Evidence Metadata</h2>
+        <span class="badge badge-success">✓ Verified</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Evidence ID</span>
+          <span class="meta-value" id="meta-evidence-id">Loading...</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Timestamp</span>
+          <span class="meta-value" id="meta-timestamp">Loading...</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">GPS / Location</span>
+          <span class="meta-value mono" id="meta-gps">Loading...</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">File Type</span>
+          <span class="meta-value" id="meta-filetype">Loading...</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">File Size</span>
+          <span class="meta-value" id="meta-filesize">Loading...</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Status</span>
+          <span class="badge badge-warning" id="meta-status">Loading...</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Distress Level</span>
+          <span class="meta-value" id="meta-distress" style="font-weight:700;">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHA-256 Hash -->
+    <div class="card mb-3" id="hash-card">
+      <div class="card-header">
+        <h2>🔐 Evidence Integrity</h2>
+        <span class="badge badge-teal">✓ Blockchain Anchored</span>
+      </div>
+      <div class="hash-display">
+        <span style="font-size:1.2rem;">🔒</span>
+        <code id="sha256-hash">Loading...</code>
+        <button class="btn btn-sm btn-secondary" id="btn-copy-hash" title="Copy Hash">📋 Copy</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.75rem;">
+        <span class="badge badge-success">✓ Hash Verified</span>
+        <span class="badge badge-teal">✓ Tamper-Proof</span>
+        <span style="font-size:0.8rem;color:var(--text-muted);" id="hash-anchor-info">Loading...</span>
+      </div>
+    </div>
+
+    <div class="two-col">
+
+      <!-- Timeline -->
+      <div class="card" id="timeline-card">
+        <div class="card-header">
+          <h2>📅 Analysis Timeline</h2>
+        </div>
+        <div class="timeline" id="incident-timeline">
+          <!-- Populated by timeline.js from backend data -->
+          <div style="text-align:center; color:var(--text-muted); padding:2rem;">
+            Loading timeline...
+          </div>
+        </div>
+      </div>
+
+      <!-- Audio Player + AI Results -->
+      <div>
+        <!-- Audio Player -->
+        <div class="card mb-3" id="audio-player-card">
+          <div class="card-header">
+            <h2>🔊 Audio Evidence</h2>
+          </div>
+          <div class="audio-player">
+            <audio id="evidence-audio" controls style="width:100%;">
+              <source src="" type="audio/webm">
+              Your browser does not support audio playback.
+            </audio>
+          </div>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.75rem;">
+            Audio playback available when evidence file exists on backend.
+          </p>
+        </div>
+
+        <!-- AI Analysis Results -->
+        <div class="card" id="ai-results-card">
+          <div class="card-header">
+            <h2>🧠 AI Analysis Results</h2>
+            <span id="distress-badge" class="badge badge-warning">⏳ Awaiting Analysis</span>
+          </div>
+
+          <div style="margin-bottom:1rem;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;">
+              <span style="font-size:0.85rem;font-weight:600;">Distress Confidence</span>
+              <span style="font-size:0.85rem;font-weight:700;" id="confidence-pct">—</span>
+            </div>
+            <div style="width:100%;height:8px;background:var(--bg-input);border-radius:4px;overflow:hidden;">
+              <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--success),var(--teal));border-radius:4px;transition:width 1s ease;" id="confidence-bar"></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1rem;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;">
+              <span style="font-size:0.85rem;font-weight:600;">Voice Stress Level</span>
+              <span style="font-size:0.85rem;font-weight:700;color:var(--text-muted);" id="voice-stress-pct">—</span>
+            </div>
+            <div style="width:100%;height:8px;background:var(--bg-input);border-radius:4px;overflow:hidden;">
+              <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--teal),var(--warning));border-radius:4px;transition:width 1s ease;" id="voice-stress-bar"></div>
+            </div>
+          </div>
+
+          <div style="padding:1rem;background:var(--bg-input);border-radius:var(--radius-md);border:1px solid var(--border-color);margin-top:1rem;">
+            <h4 style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;color:var(--text-secondary);">AI Summary</h4>
+            <p style="font-size:0.88rem;line-height:1.7;color:var(--text-primary);" id="ai-summary-text">
+              Click "Analyze with AI" to process this evidence and view results.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 AI Digital Memory Vault — Hackathon Project | Built for Justice</p>
+  </footer>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/timeline.js"></script>
+</body>
+</html>

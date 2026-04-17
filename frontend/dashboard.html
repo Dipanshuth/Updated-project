@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI Memory Vault Dashboard — View all submitted evidence, incident analysis, and generated FIRs.">
+  <title>Dashboard — AI Digital Memory Vault</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="main-navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🛡️</div>
+      <span>Memory Vault</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" id="nav-home">🏠 Home</a></li>
+      <li><a href="dashboard.html" class="active" id="nav-dashboard">📊 Dashboard</a></li>
+      <li><a href="upload.html" id="nav-upload">📤 Upload</a></li>
+      <li><a href="incident.html" id="nav-incident">🔍 Incidents</a></li>
+      <li><a href="report.html" id="nav-report">📄 Reports</a></li>
+    </ul>
+    <div class="nav-status">
+      <div class="status-dot"></div>
+      <span>System Active</span>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <!-- Page Header -->
+    <div class="page-header flex-between">
+      <div>
+        <h1>📊 Evidence Dashboard</h1>
+        <p>Overview of all submitted evidence and incident analysis</p>
+      </div>
+      <a href="upload.html" class="btn btn-primary" id="btn-upload-new">
+        ➕ Upload New Evidence
+      </a>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row" id="stats-section">
+      <div class="stat-card" id="stat-total">
+        <div class="stat-icon teal">📁</div>
+        <div class="stat-info">
+          <h3 id="stat-total-count">12</h3>
+          <p>Total Evidence</p>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-analyzed">
+        <div class="stat-icon blue">🧠</div>
+        <div class="stat-info">
+          <h3 id="stat-analyzed-count">8</h3>
+          <p>Incidents Analyzed</p>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-firs">
+        <div class="stat-icon amber">📄</div>
+        <div class="stat-info">
+          <h3 id="stat-fir-count">5</h3>
+          <p>FIRs Generated</p>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-pending">
+        <div class="stat-icon green">⏳</div>
+        <div class="stat-info">
+          <h3 id="stat-pending-count">4</h3>
+          <p>Pending Review</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evidence Table -->
+    <div class="card" id="evidence-table-card">
+      <div class="card-header">
+        <h2>📋 Evidence Records</h2>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <input type="text" class="form-control" placeholder="Search evidence..." style="width:220px;padding:0.5rem 0.8rem;font-size:0.85rem;" id="search-evidence">
+          <select class="form-control" style="width:140px;padding:0.5rem 0.8rem;font-size:0.85rem;" id="filter-status">
+            <option value="all">All Status</option>
+            <option value="analyzed">Analyzed</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="evidence-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Timestamp</th>
+              <th>Type</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Confidence</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="evidence-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card mt-3" id="recent-activity-card">
+      <div class="card-header">
+        <h2>🕐 Recent Activity</h2>
+      </div>
+      <div id="activity-feed">
+        <div style="display:flex;gap:1rem;padding:0.75rem 0;border-bottom:1px solid var(--border-color);align-items:center;">
+          <span class="badge badge-success">✓ Analyzed</span>
+          <span style="font-size:0.9rem;">Evidence #EVD-005 analyzed — Distress detected (87% confidence)</span>
+          <span style="margin-left:auto;font-size:0.8rem;color:var(--text-muted);font-family:var(--font-mono);">2 min ago</span>
+        </div>
+        <div style="display:flex;gap:1rem;padding:0.75rem 0;border-bottom:1px solid var(--border-color);align-items:center;">
+          <span class="badge badge-info">📤 Uploaded</span>
+          <span style="font-size:0.9rem;">New evidence submitted from GPS: 28.6139°N, 77.2090°E</span>
+          <span style="margin-left:auto;font-size:0.8rem;color:var(--text-muted);font-family:var(--font-mono);">15 min ago</span>
+        </div>
+        <div style="display:flex;gap:1rem;padding:0.75rem 0;border-bottom:1px solid var(--border-color);align-items:center;">
+          <span class="badge badge-warning">📄 FIR</span>
+          <span style="font-size:0.9rem;">FIR Report generated for Incident #INC-003</span>
+          <span style="margin-left:auto;font-size:0.8rem;color:var(--text-muted);font-family:var(--font-mono);">1 hr ago</span>
+        </div>
+        <div style="display:flex;gap:1rem;padding:0.75rem 0;align-items:center;">
+          <span class="badge badge-teal">🔐 Hashed</span>
+          <span style="font-size:0.9rem;">SHA-256 hash anchored for Evidence #EVD-004</span>
+          <span style="margin-left:auto;font-size:0.8rem;color:var(--text-muted);font-family:var(--font-mono);">2 hrs ago</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 AI Digital Memory Vault — Hackathon Project | Built for Justice</p>
+  </footer>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
