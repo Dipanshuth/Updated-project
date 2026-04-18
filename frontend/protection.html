@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Active Protection — AI Digital Memory Vault</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
   <style>
     .protection-container {
       display: flex;
@@ -15,6 +17,7 @@
       min-height: 70vh;
       text-align: center;
     }
+
     .status-circle {
       width: 150px;
       height: 150px;
@@ -29,22 +32,35 @@
       transition: all 0.5s ease;
       position: relative;
     }
+
     .status-circle.pulsing {
       animation: pulse-ring 2s infinite;
     }
+
     .status-circle.recording {
       border-color: var(--danger);
       background: rgba(255, 71, 87, 0.1);
     }
+
     .status-circle.processing {
       border-color: var(--warning);
       background: rgba(255, 165, 2, 0.1);
     }
+
     @keyframes pulse-ring {
-      0% { box-shadow: 0 0 0 0 rgba(0, 201, 177, 0.4); }
-      70% { box-shadow: 0 0 0 20px rgba(0, 201, 177, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(0, 201, 177, 0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 201, 177, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 20px rgba(0, 201, 177, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 201, 177, 0);
+      }
     }
+
     .demo-controls {
       margin-top: 3rem;
       padding: 1.5rem;
@@ -54,7 +70,7 @@
       width: 100%;
       max-width: 500px;
     }
-    
+
     .pipeline-step {
       display: flex;
       align-items: center;
@@ -64,13 +80,16 @@
       font-size: 0.95rem;
       text-align: left;
     }
+
     .pipeline-step.active {
       color: var(--text-light);
       font-weight: bold;
     }
+
     .pipeline-step.completed {
       color: var(--success);
     }
+
     .step-icon {
       width: 24px;
       height: 24px;
@@ -94,15 +113,25 @@
       text-align: left;
       animation: fadeInUp 0.5s ease;
     }
+
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
+
     .results-panel h3 {
       text-align: center;
       margin-bottom: 1.2rem;
       font-size: 1.15rem;
     }
+
     .result-row {
       display: flex;
       justify-content: space-between;
@@ -111,19 +140,31 @@
       border-bottom: 1px solid var(--border-color);
       font-size: 0.92rem;
     }
+
     .result-row:last-child {
       border-bottom: none;
     }
+
     .result-label {
       color: var(--text-muted);
       font-weight: 500;
     }
+
     .result-value {
       font-weight: 700;
     }
-    .result-value.low { color: var(--success); }
-    .result-value.medium { color: var(--warning); }
-    .result-value.high { color: var(--danger); }
+
+    .result-value.low {
+      color: var(--success);
+    }
+
+    .result-value.medium {
+      color: var(--warning);
+    }
+
+    .result-value.high {
+      color: var(--danger);
+    }
 
     .confidence-bar-container {
       width: 100%;
@@ -133,11 +174,13 @@
       overflow: hidden;
       margin: 0.5rem 0 1rem;
     }
+
     .confidence-bar-fill {
       height: 100%;
       border-radius: 5px;
       transition: width 1.2s ease;
     }
+
     .result-message {
       padding: 0.8rem 1rem;
       border-radius: 8px;
@@ -145,9 +188,24 @@
       line-height: 1.6;
       margin: 1rem 0;
     }
-    .result-message.low { background: rgba(0, 201, 177, 0.1); border: 1px solid rgba(0, 201, 177, 0.3); color: var(--success); }
-    .result-message.medium { background: rgba(255, 165, 2, 0.1); border: 1px solid rgba(255, 165, 2, 0.3); color: var(--warning); }
-    .result-message.high { background: rgba(255, 71, 87, 0.1); border: 1px solid rgba(255, 71, 87, 0.3); color: var(--danger); }
+
+    .result-message.low {
+      background: rgba(0, 201, 177, 0.1);
+      border: 1px solid rgba(0, 201, 177, 0.3);
+      color: var(--success);
+    }
+
+    .result-message.medium {
+      background: rgba(255, 165, 2, 0.1);
+      border: 1px solid rgba(255, 165, 2, 0.3);
+      color: var(--warning);
+    }
+
+    .result-message.high {
+      background: rgba(255, 71, 87, 0.1);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      color: var(--danger);
+    }
 
     .results-actions {
       display: flex;
@@ -157,6 +215,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="bg-grid"></div>
@@ -165,12 +224,12 @@
   <!-- Navbar -->
   <nav class="navbar" id="main-navbar">
     <a href="index.html" class="nav-brand">
-      <div class="brand-icon">🛡️</div>
+      <div class="brand-icon"></div>
       <span>Memory Vault</span>
     </a>
     <ul class="nav-links">
-      <li><a href="index.html">🏠 Home</a></li>
-      <li><a href="dashboard.html">📊 Dashboard</a></li>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
     </ul>
     <div class="nav-status" id="nav-mode-indicator">
       <div class="status-dot"></div>
@@ -190,7 +249,8 @@
     </p>
 
     <!-- Pipeline UI (Hidden by default) -->
-    <div id="pipeline-ui" style="display:none; width:100%; max-width:400px; margin: 0 auto 2rem auto; background: var(--surface); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+    <div id="pipeline-ui"
+      style="display:none; width:100%; max-width:400px; margin: 0 auto 2rem auto; background: var(--surface); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
       <h3 style="text-align:left; margin-bottom:1rem; font-size:1.1rem;">Live AI Pipeline</h3>
       <div class="pipeline-step" id="step-detect">
         <div class="step-icon">1</div>
@@ -220,11 +280,12 @@
 
     <!-- Results Panel (Hidden by default, shown after pipeline completes) -->
     <div id="results-panel" class="results-panel" style="display:none;">
-      <h3>📊 Analysis Results</h3>
-      
+      <h3>Analysis Results</h3>
+
       <div class="result-row">
         <span class="result-label">Evidence ID</span>
-        <span class="result-value" id="result-evidence-id" style="color:var(--teal); font-family:var(--font-mono);">—</span>
+        <span class="result-value" id="result-evidence-id"
+          style="color:var(--teal); font-family:var(--font-mono);">—</span>
       </div>
       <div class="result-row">
         <span class="result-label">Distress Level</span>
@@ -234,7 +295,7 @@
         <span class="result-label">Confidence</span>
         <span class="result-value" id="result-confidence">—</span>
       </div>
-      
+
       <div class="confidence-bar-container">
         <div class="confidence-bar-fill" id="result-confidence-bar" style="width:0%;"></div>
       </div>
@@ -251,9 +312,9 @@
       <div class="result-message" id="result-message">—</div>
 
       <div class="results-actions">
-        <a href="#" class="btn btn-primary" id="btn-view-report">📄 View Report</a>
-        <a href="#" class="btn btn-secondary" id="btn-view-incident">🔍 View Incident</a>
-        <button class="btn btn-secondary" id="btn-new-demo" onclick="resetDemo()">🔄 New Test</button>
+        <a href="#" class="btn btn-primary" id="btn-view-report">View Report</a>
+        <a href="#" class="btn btn-secondary" id="btn-view-incident">View Incident</a>
+        <button class="btn btn-secondary" id="btn-new-demo" onclick="resetDemo()">New Test</button>
       </div>
     </div>
 
@@ -263,10 +324,10 @@
       <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
         Trigger the full end-to-end AI pipeline simulation. Ensure backend is running.
       </p>
-      
+
       <div style="display:flex; justify-content:center; gap: 1rem;">
         <button class="btn btn-primary" id="btn-trigger-demo" onclick="startDemoPipeline()">
-          🚨 Simulate Trigger
+          Simulate Trigger
         </button>
       </div>
     </div>
@@ -277,6 +338,8 @@
     <p>© 2026 AI Digital Memory Vault</p>
   </footer>
 
+  <script src="js/config.js"></script>
   <script src="js/protection.js"></script>
 </body>
+
 </html>

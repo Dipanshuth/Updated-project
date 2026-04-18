@@ -3,7 +3,7 @@
  * Handles: Dashboard table, API calls, toast notifications, utilities
  */
 
-const API_BASE = `http://${window.location.hostname || 'localhost'}:8000`;
+const API_BASE = window.API_BASE || (window.getApiBaseUrl ? window.getApiBaseUrl() : `http://${window.location.hostname || 'localhost'}:8000`);
 
 // ========== State ==========
 let fetchedEvidence = []; // Store fetched evidence for filtering
@@ -182,6 +182,14 @@ function getTimeAgo(timestamp) {
   }
 }
 
+async function resolveLocationSummary(latitude, longitude) {
+  if (!latitude || !longitude || typeof window.fetchLocationResolution !== 'function') {
+    return null;
+  }
+
+  return window.fetchLocationResolution(latitude, longitude);
+}
+
 // ========== Dashboard: Update Stats ==========
 function updateStats(data) {
   const totalEl = document.getElementById('stat-total-count');
@@ -214,13 +222,13 @@ function filterTable() {
 
   // Filter the FETCHED backend data, not mock data
   let filtered = fetchedEvidence.filter(item => {
-    const matchSearch = !search ||
-      (item.id || '').toLowerCase().includes(search) ||
-      (item.location || '').toLowerCase().includes(search) ||
-      (item.type || '').toLowerCase().includes(search) ||
-      (item.filename || '').toLowerCase().includes(search) ||
-      (item.description || '').toLowerCase().includes(search);
-    const matchStatus = status === 'all' || item.status === status;
+    const matchSearch = !search || 
+      String(item.id || '').toLowerCase().includes(search) ||
+      String(item.location || '').toLowerCase().includes(search) ||
+      String(item.type || '').toLowerCase().includes(search) ||
+      String(item.filename || '').toLowerCase().includes(search) ||
+      String(item.description || '').toLowerCase().includes(search);
+    const matchStatus = status === 'all' || String(item.status || '') === status;
     return matchSearch && matchStatus;
   });
 
@@ -247,7 +255,14 @@ async function loadIncidentDetail(evidenceId) {
 
     const metaGps = document.getElementById('meta-gps');
     if (metaGps) {
-      if (data.latitude && data.longitude) {
+      const resolvedLocation = await resolveLocationSummary(data.latitude, data.longitude);
+
+      if (resolvedLocation) {
+        const policeStationText = resolvedLocation.nearest_police_station
+          ? `${resolvedLocation.nearest_police_station}${resolvedLocation.nearest_police_station_distance_km !== null && resolvedLocation.nearest_police_station_distance_km !== undefined ? ` (${resolvedLocation.nearest_police_station_distance_km} km away)` : ''}`
+          : 'Not available';
+        metaGps.textContent = `${resolvedLocation.resolved_address || data.location || 'Not provided'} | Nearest police station: ${policeStationText}`;
+      } else if (data.latitude && data.longitude) {
         metaGps.textContent = `${data.latitude}°N, ${data.longitude}°E`;
       } else {
         metaGps.textContent = data.location || 'Not provided';

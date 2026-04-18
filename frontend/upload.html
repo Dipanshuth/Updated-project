@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Upload evidence — Record audio, upload files, and capture GPS location for your incident report.">
+  <meta name="description"
+    content="Upload evidence — Record audio, upload files, and capture GPS location for your incident report.">
   <title>Upload Evidence — AI Digital Memory Vault</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>">
 </head>
+
 <body>
 
   <div class="bg-grid"></div>
@@ -21,11 +25,11 @@
       <span>Memory Vault</span>
     </a>
     <ul class="nav-links">
-      <li><a href="index.html" id="nav-home">🏠 Home</a></li>
-      <li><a href="dashboard.html" id="nav-dashboard">📊 Dashboard</a></li>
-      <li><a href="upload.html" class="active" id="nav-upload">📤 Upload</a></li>
-      <li><a href="incident.html" id="nav-incident">🔍 Incidents</a></li>
-      <li><a href="report.html" id="nav-report">📄 Reports</a></li>
+      <li><a href="index.html" id="nav-home">Home</a></li>
+      <li><a href="dashboard.html" id="nav-dashboard">Dashboard</a></li>
+      <li><a href="upload.html" class="active" id="nav-upload">Upload</a></li>
+      <li><a href="incident.html" id="nav-incident">Incidents</a></li>
+      <li><a href="report.html" id="nav-report">Reports</a></li>
     </ul>
     <div class="nav-status">
       <div class="status-dot"></div>
@@ -36,7 +40,7 @@
   <main class="main-content">
 
     <div class="page-header">
-      <h1>📤 Upload Evidence</h1>
+      <h1>Upload Evidence</h1>
       <p>Record audio, upload files, and capture your GPS location</p>
     </div>
 
@@ -62,10 +66,10 @@
 
           <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:1rem;">
             <button type="button" class="btn btn-secondary btn-sm" id="btn-play-recording" disabled>
-              ▶️ Play
+              Play
             </button>
             <button type="button" class="btn btn-danger btn-sm" id="btn-clear-recording" disabled>
-              🗑️ Clear
+              Clear
             </button>
           </div>
 
@@ -90,11 +94,13 @@
         <div class="upload-area" id="upload-dropzone">
           <div class="upload-icon">📁</div>
           <p>Drag & drop audio files here, or <span>browse files</span></p>
-          <p style="font-size:0.78rem;margin-top:0.5rem;color:var(--text-muted);">Supported: MP3, WAV, OGG, WEBM (Max 50MB)</p>
+          <p style="font-size:0.78rem;margin-top:0.5rem;color:var(--text-muted);">Supported: MP3, WAV, OGG, WEBM (Max
+            50MB)</p>
           <input type="file" id="file-input" accept="audio/*" style="display:none;">
         </div>
 
-        <div id="file-preview" class="hidden mt-2" style="padding:0.75rem 1rem;background:var(--bg-input);border-radius:var(--radius-md);border:1px solid var(--border-color);">
+        <div id="file-preview" class="hidden mt-2"
+          style="padding:0.75rem 1rem;background:var(--bg-input);border-radius:var(--radius-md);border:1px solid var(--border-color);">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <div style="display:flex;align-items:center;gap:0.75rem;">
               <span style="font-size:1.2rem;">🎵</span>
@@ -110,7 +116,8 @@
         <div class="two-col mt-3">
           <div class="form-group">
             <label for="incident-description">Incident Description</label>
-            <textarea class="form-control" id="incident-description" placeholder="Describe what happened..." rows="4"></textarea>
+            <textarea class="form-control" id="incident-description" placeholder="Describe what happened..."
+              rows="4"></textarea>
           </div>
           <div>
             <div class="form-group">
@@ -119,7 +126,8 @@
             </div>
             <div class="form-group">
               <label for="incident-location">Location (Text)</label>
-              <input type="text" class="form-control" id="incident-location" placeholder="e.g. Connaught Place, New Delhi">
+              <input type="text" class="form-control" id="incident-location"
+                placeholder="e.g. Connaught Place, New Delhi">
             </div>
           </div>
         </div>
@@ -136,12 +144,26 @@
           <button type="button" class="btn btn-secondary" id="btn-get-location">
             📍 Get My Location
           </button>
+          <button type="button" class="btn btn-outline" id="btn-use-approx-location" style="display:none;margin-left:0.6rem;">
+            Use Approximate Location
+          </button>
 
           <div id="gps-result" class="hidden">
             <div class="gps-coords mt-2">
               <span>📍</span>
               <code id="gps-lat-lng">Lat: ---, Lng: ---</code>
               <span class="badge badge-success">✓ Captured</span>
+            </div>
+
+            <div style="display:grid;gap:0.7rem;margin-top:0.85rem;padding:0.85rem 1rem;background:var(--bg-input);border:1px solid var(--border-color);border-radius:var(--radius-md);">
+              <div>
+                <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:0.25rem;">Resolved Address</div>
+                <div id="gps-address" style="font-size:0.93rem;font-weight:600;line-height:1.5;">Waiting for location...</div>
+              </div>
+              <div>
+                <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:0.25rem;">Nearest Police Station</div>
+                <div id="gps-police-station" style="font-size:0.93rem;font-weight:600;line-height:1.5;">Waiting for location...</div>
+              </div>
             </div>
 
             <div class="map-container mt-2" id="map-container">
@@ -158,7 +180,7 @@
       <div style="display:flex;gap:1rem;justify-content:flex-end;margin-top:2rem;" id="submit-section">
         <button type="button" class="btn btn-secondary" id="btn-reset-form">🔄 Reset</button>
         <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-evidence">
-          🚀 Submit Evidence
+          Submit Evidence
         </button>
       </div>
 
@@ -172,6 +194,9 @@
 
   <div class="toast-container" id="toast-container"></div>
 
-  <script src="js/upload.js"></script>
+  <script src="js/config.js?v=4"></script>
+  <script src="js/location.js?v=4"></script>
+  <script src="js/upload.js?v=4"></script>
 </body>
+
 </html>

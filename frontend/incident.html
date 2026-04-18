@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Incident Detail — View evidence metadata, SHA-256 hash, AI analysis timeline, and audio player.">
+  <meta name="description"
+    content="Incident Detail — View evidence metadata, SHA-256 hash, AI analysis timeline, and audio player.">
   <title>Incident Detail — AI Digital Memory Vault</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>">
 </head>
+
 <body>
 
   <div class="bg-grid"></div>
@@ -21,11 +25,11 @@
       <span>Memory Vault</span>
     </a>
     <ul class="nav-links">
-      <li><a href="index.html" id="nav-home">🏠 Home</a></li>
-      <li><a href="dashboard.html" id="nav-dashboard">📊 Dashboard</a></li>
-      <li><a href="upload.html" id="nav-upload">📤 Upload</a></li>
-      <li><a href="incident.html" class="active" id="nav-incident">🔍 Incidents</a></li>
-      <li><a href="report.html" id="nav-report">📄 Reports</a></li>
+      <li><a href="index.html" id="nav-home">Home</a></li>
+      <li><a href="dashboard.html" id="nav-dashboard">Dashboard</a></li>
+      <li><a href="upload.html" id="nav-upload">Upload</a></li>
+      <li><a href="incident.html" class="active" id="nav-incident">Incidents</a></li>
+      <li><a href="report.html" id="nav-report">Reports</a></li>
     </ul>
     <div class="nav-status">
       <div class="status-dot"></div>
@@ -38,7 +42,8 @@
     <div class="page-header flex-between">
       <div>
         <h1>🔍 Incident Detail</h1>
-        <p>Evidence ID: <span class="text-teal" id="evidence-id-display" style="font-family:var(--font-mono);font-weight:600;">Loading...</span></p>
+        <p>Evidence ID: <span class="text-teal" id="evidence-id-display"
+            style="font-family:var(--font-mono);font-weight:600;">Loading...</span></p>
       </div>
       <div style="display:flex;gap:0.5rem;">
         <button class="btn btn-primary" id="btn-analyze-ai">🧠 Analyze with AI</button>
@@ -148,7 +153,9 @@
               <span style="font-size:0.85rem;font-weight:700;" id="confidence-pct">—</span>
             </div>
             <div style="width:100%;height:8px;background:var(--bg-input);border-radius:4px;overflow:hidden;">
-              <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--success),var(--teal));border-radius:4px;transition:width 1s ease;" id="confidence-bar"></div>
+              <div
+                style="width:0%;height:100%;background:linear-gradient(90deg,var(--success),var(--teal));border-radius:4px;transition:width 1s ease;"
+                id="confidence-bar"></div>
             </div>
           </div>
 
@@ -158,12 +165,16 @@
               <span style="font-size:0.85rem;font-weight:700;color:var(--text-muted);" id="voice-stress-pct">—</span>
             </div>
             <div style="width:100%;height:8px;background:var(--bg-input);border-radius:4px;overflow:hidden;">
-              <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--teal),var(--warning));border-radius:4px;transition:width 1s ease;" id="voice-stress-bar"></div>
+              <div
+                style="width:0%;height:100%;background:linear-gradient(90deg,var(--teal),var(--warning));border-radius:4px;transition:width 1s ease;"
+                id="voice-stress-bar"></div>
             </div>
           </div>
 
-          <div style="padding:1rem;background:var(--bg-input);border-radius:var(--radius-md);border:1px solid var(--border-color);margin-top:1rem;">
-            <h4 style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;color:var(--text-secondary);">AI Summary</h4>
+          <div
+            style="padding:1rem;background:var(--bg-input);border-radius:var(--radius-md);border:1px solid var(--border-color);margin-top:1rem;">
+            <h4 style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;color:var(--text-secondary);">AI Summary
+            </h4>
             <p style="font-size:0.88rem;line-height:1.7;color:var(--text-primary);" id="ai-summary-text">
               Click "Analyze with AI" to process this evidence and view results.
             </p>
@@ -181,7 +192,10 @@
 
   <div class="toast-container" id="toast-container"></div>
 
+  <script src="js/config.js"></script>
+  <script src="js/location.js"></script>
   <script src="js/app.js?v=2"></script>
   <script src="js/timeline.js?v=2"></script>
 </body>
+
 </html>

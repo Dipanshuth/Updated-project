@@ -5,7 +5,16 @@
 ## 🚀 Quick Start
 
 ### Frontend
-Simply open `frontend/index.html` in your browser — no build tools needed!
+Recommended: run frontend through FastAPI on port 8000 (same origin as backend).
+
+After backend starts, open:
+
+```
+http://localhost:8000
+```
+
+Alternative: you can still open `frontend/index.html` directly or via Live Server.
+The frontend will automatically call backend at `http://<hostname>:8000`.
 
 ```
 frontend/index.html       → Landing page
@@ -15,7 +24,7 @@ frontend/incident.html    → Incident detail with timeline
 frontend/report.html      → FIR report viewer
 ```
 
-### Backend
+### Backend (Recommended Single-Server Mode)
 ```bash
 # Navigate to backend
 cd backend
@@ -24,12 +33,13 @@ cd backend
 pip install fastapi uvicorn sqlalchemy python-multipart fpdf2
 
 # Run the server
-python main.py
-# or
-uvicorn main:app --reload --port 8000
+py -m uvicorn main:app --reload --port 8000
 ```
 
-The API will be available at `http://localhost:8000`
+This serves both:
+
+- Frontend: `http://localhost:8000`
+- API docs: `http://localhost:8000/docs`
 
 ## 📁 Project Structure
 

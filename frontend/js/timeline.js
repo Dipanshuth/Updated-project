@@ -76,7 +76,7 @@ function renderTimeline(container, events) {
 
 // ========== Fetch Timeline from Backend ==========
 async function fetchTimeline(evidenceId) {
-  const API_BASE = `http://${window.location.hostname || 'localhost'}:8000`;
+  const API_BASE = window.API_BASE || (window.getApiBaseUrl ? window.getApiBaseUrl() : `http://${window.location.hostname || 'localhost'}:8000`);
 
   try {
     const response = await fetch(`${API_BASE}/evidence/${evidenceId}/timeline`);

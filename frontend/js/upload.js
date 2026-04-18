@@ -3,7 +3,12 @@
  * Features: MediaRecorder API, Waveform Visualization, File Upload, GPS Capture
  */
 
-const API_BASE = `http://${window.location.hostname || 'localhost'}:8000`;
+const API_BASE = window.API_BASE || (window.getApiBaseUrl ? window.getApiBaseUrl() : `http://${window.location.hostname || 'localhost'}:8000`);
+const MAX_ACCEPTABLE_ACCURACY_METERS = 120;
+const DEFAULT_LIKE_COORDINATES = [
+  { lat: 28.6139, lng: 77.2090 },
+  { lat: 28.6324, lng: 77.2187 },
+];
 
 // ========== State ==========
 let mediaRecorder = null;
@@ -15,6 +20,7 @@ let analyser = null;
 let animationId = null;
 let recordingStartTime = null;
 let timerInterval = null;
+let lastRejectedLocation = null;
 
 // ========== Toast (duplicate-safe) ==========
 function showToast(message, type = 'info') {
@@ -262,14 +268,167 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+function haversineMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const toRad = (deg) => deg * (Math.PI / 180);
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function isLikelyDefaultLocation(lat, lng, accuracyMeters) {
+  const latNum = Number(lat);
+  const lngNum = Number(lng);
+
+  if (!Number.isFinite(latNum) || !Number.isFinite(lngNum)) {
+    return false;
+  }
+
+  return DEFAULT_LIKE_COORDINATES.some((point) => {
+    const distance = haversineMeters(latNum, lngNum, point.lat, point.lng);
+    return distance <= 1200 && accuracyMeters >= 80;
+  });
+}
+
+function getBestGpsFix() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation not supported'));
+      return;
+    }
+
+    let bestPosition = null;
+    let resolved = false;
+
+    const finalize = () => {
+      if (resolved) return;
+      resolved = true;
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+      if (bestPosition) {
+        resolve(bestPosition);
+      } else {
+        reject(new Error('Unable to fetch location'));
+      }
+    };
+
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const currentAccuracy = position.coords.accuracy || Number.POSITIVE_INFINITY;
+        const bestAccuracy = bestPosition?.coords?.accuracy || Number.POSITIVE_INFINITY;
+
+        if (!bestPosition || currentAccuracy < bestAccuracy) {
+          bestPosition = position;
+        }
+
+        // Good enough accuracy for civic-use UI.
+        if (currentAccuracy <= 35) {
+          finalize();
+        }
+      },
+      (error) => {
+        if (resolved) return;
+        resolved = true;
+        if (watchId !== null) {
+          navigator.geolocation.clearWatch(watchId);
+        }
+        reject(error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 0,
+      }
+    );
+
+    // Stop listening after a short window and use best fix found.
+    setTimeout(finalize, 9000);
+  });
+}
+
+async function populateLocationFromCoords(lat, lng, accuracyMeters, options = {}) {
+  const { isApproximate = false } = options;
+
+  document.getElementById('gps-lat').value = lat;
+  document.getElementById('gps-lng').value = lng;
+  document.getElementById('gps-lat-lng').textContent = isApproximate
+    ? `Lat: ${lat}, Lng: ${lng} (±${accuracyMeters}m) — Approximate`
+    : `Lat: ${lat}, Lng: ${lng} (±${accuracyMeters}m)`;
+  document.getElementById('gps-result').classList.remove('hidden');
+  document.getElementById('gps-badge').textContent = isApproximate ? 'Approximate' : '✓ Captured';
+  document.getElementById('gps-badge').className = isApproximate ? 'badge badge-warning' : 'badge badge-success';
+
+  const mapIframe = document.getElementById('map-iframe');
+  mapIframe.src = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01},${lat - 0.01},${parseFloat(lng) + 0.01},${parseFloat(lat) + 0.01}&layer=mapnik&marker=${lat},${lng}`;
+
+  const locationInput = document.getElementById('incident-location');
+  const addressEl = document.getElementById('gps-address');
+  const policeStationEl = document.getElementById('gps-police-station');
+
+  if (addressEl) addressEl.textContent = 'Resolving exact address...';
+  if (policeStationEl) policeStationEl.textContent = 'Finding nearest police station...';
+
+  const resolved = typeof window.fetchLocationResolution === 'function'
+    ? await window.fetchLocationResolution(lat, lng)
+    : null;
+
+  const resolvedAddress = resolved?.resolved_address || `${lat}, ${lng}`;
+  const policeStation = resolved?.nearest_police_station
+    ? `${resolved.nearest_police_station}${resolved.nearest_police_station_distance_km !== null && resolved.nearest_police_station_distance_km !== undefined ? ` (${resolved.nearest_police_station_distance_km} km away)` : ''}`
+    : 'Not available';
+
+  if (locationInput && (!locationInput.value || locationInput.value.trim() === '')) {
+    locationInput.value = resolvedAddress;
+  }
+
+  if (addressEl) {
+    addressEl.textContent = isApproximate
+      ? `${resolvedAddress} (Approximate, GPS accuracy ±${accuracyMeters}m)`
+      : `${resolvedAddress} (GPS accuracy ±${accuracyMeters}m)`;
+  }
+  if (policeStationEl) policeStationEl.textContent = policeStation;
+
+  const approximateBtn = document.getElementById('btn-use-approx-location');
+  if (approximateBtn) {
+    approximateBtn.style.display = 'none';
+  }
+}
+
+function setupApproximateLocationFallback() {
+  const approximateBtn = document.getElementById('btn-use-approx-location');
+  if (!approximateBtn) return;
+
+  approximateBtn.addEventListener('click', async () => {
+    if (!lastRejectedLocation) {
+      showToast('No rejected location available to use.', 'warning');
+      return;
+    }
+
+    const { lat, lng, accuracyMeters } = lastRejectedLocation;
+    await populateLocationFromCoords(lat, lng, accuracyMeters, { isApproximate: true });
+    showToast(`Using approximate location (±${accuracyMeters}m).`, 'warning');
+
+    const gpsBtn = document.getElementById('btn-get-location');
+    if (gpsBtn) {
+      gpsBtn.disabled = false;
+      gpsBtn.innerHTML = '📍 Retry For Better Accuracy';
+    }
+  });
+}
+
 // ========== GPS Location ==========
 function setupGPS() {
   const btn = document.getElementById('btn-get-location');
   if (!btn) return;
 
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', async () => {
     btn.disabled = true;
-    btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Locating...';
+    btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;"></div> Locating (high accuracy)...';
 
     if (!navigator.geolocation) {
       showToast('Geolocation not supported by your browser', 'error');
@@ -278,38 +437,52 @@ function setupGPS() {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude.toFixed(6);
-        const lng = position.coords.longitude.toFixed(6);
+    try {
+      const position = await getBestGpsFix();
+      const lat = position.coords.latitude.toFixed(6);
+      const lng = position.coords.longitude.toFixed(6);
+      const accuracyMeters = Math.round(position.coords.accuracy || 0);
 
-        // Update UI
-        document.getElementById('gps-lat').value = lat;
-        document.getElementById('gps-lng').value = lng;
-        document.getElementById('gps-lat-lng').textContent = `Lat: ${lat}, Lng: ${lng}`;
+      if (accuracyMeters > MAX_ACCEPTABLE_ACCURACY_METERS || isLikelyDefaultLocation(lat, lng, accuracyMeters)) {
+        lastRejectedLocation = { lat, lng, accuracyMeters };
+        showToast(
+          `Location is too coarse (±${accuracyMeters}m). Move near open sky, enable precise device location, then retry.`,
+          'warning'
+        );
+        document.getElementById('gps-lat').value = '';
+        document.getElementById('gps-lng').value = '';
+        document.getElementById('gps-lat-lng').textContent = `Lat: ${lat}, Lng: ${lng} (±${accuracyMeters}m) — Not accepted`;
         document.getElementById('gps-result').classList.remove('hidden');
-        document.getElementById('gps-badge').textContent = '✓ Captured';
-        document.getElementById('gps-badge').className = 'badge badge-success';
+        document.getElementById('gps-badge').textContent = 'Retry Needed';
+        document.getElementById('gps-badge').className = 'badge badge-warning';
 
-        // Show map
-        const mapIframe = document.getElementById('map-iframe');
-        mapIframe.src = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01},${lat - 0.01},${parseFloat(lng) + 0.01},${parseFloat(lat) + 0.01}&layer=mapnik&marker=${lat},${lng}`;
+        const addressEl = document.getElementById('gps-address');
+        const policeStationEl = document.getElementById('gps-police-station');
+        const approximateBtn = document.getElementById('btn-use-approx-location');
+        if (addressEl) addressEl.textContent = 'Location rejected due to low precision. Please retry outdoors.';
+        if (policeStationEl) policeStationEl.textContent = 'Waiting for high-accuracy location...';
+        if (approximateBtn) approximateBtn.style.display = 'inline-flex';
 
-        btn.innerHTML = '✅ Location Captured';
-        showToast(`GPS Location: ${lat}, ${lng}`, 'success');
-      },
-      (error) => {
-        const messages = {
-          1: 'Location access denied. Please allow location permissions.',
-          2: 'Position unavailable. Try again.',
-          3: 'Location request timed out. Try again.',
-        };
-        showToast(messages[error.code] || 'Failed to get location', 'error');
         btn.disabled = false;
-        btn.innerHTML = '📍 Get My Location';
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+        btn.innerHTML = '📍 Retry Location';
+        return;
+      }
+
+      lastRejectedLocation = null;
+      await populateLocationFromCoords(lat, lng, accuracyMeters, { isApproximate: false });
+
+      btn.innerHTML = '✅ Location Captured';
+      showToast(`GPS Location captured (accuracy ±${accuracyMeters}m)`, 'success');
+    } catch (error) {
+      const messages = {
+        1: 'Location access denied. Please allow location permissions.',
+        2: 'Position unavailable. Try moving near open sky and try again.',
+        3: 'Location request timed out. Try again.',
+      };
+      showToast(messages[error.code] || 'Failed to get location', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '📍 Get My Location';
+    }
   });
 }
 
@@ -508,6 +681,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Setup features
   setupFileUpload();
   setupGPS();
+  setupApproximateLocationFallback();
   setupFormSubmission();
   setupReset();
 
