@@ -1,0 +1,12 @@
+{
+  "name": "ai-digital-memory-vault",
+  "version": "1.0.0",
+  "description": "AI-powered evidence management system",
+  "scripts": {
+    "build": "echo 'Build complete - static files ready'",
+    "dev": "echo 'Development server not needed for static deployment'"
+  },
+  "keywords": ["ai", "evidence", "digital", "memory", "vault"],
+  "author": "Your Name",
+  "license": "MIT"
+}

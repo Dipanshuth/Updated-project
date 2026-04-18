@@ -1,0 +1,21 @@
+[build]
+  publish = "frontend"
+  command = "echo 'No build step required'"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-backend-url.onrender.com/api/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/docs"
+  to = "https://your-backend-url.onrender.com/docs"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
