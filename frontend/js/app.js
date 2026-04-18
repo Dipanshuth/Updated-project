@@ -3,7 +3,7 @@
  * Handles: Dashboard table, API calls, toast notifications, utilities
  */
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = `http://${window.location.hostname || 'localhost'}:8000`;
 
 // ========== State ==========
 let fetchedEvidence = []; // Store fetched evidence for filtering
@@ -109,6 +109,7 @@ async function fetchEvidenceList() {
       fetchedEvidence = evidence; // Store for filtering
       populateEvidenceTable(evidence);
       updateStats(evidence);
+      populateActivityFeed(evidence);
       return;
     }
   } catch (e) {
@@ -119,6 +120,66 @@ async function fetchEvidenceList() {
   fetchedEvidence = [];
   populateEvidenceTable([]);
   updateStats([]);
+  populateActivityFeed([]);
+}
+
+// ========== Dashboard: Populate Activity Feed ==========
+function populateActivityFeed(data) {
+  const feed = document.getElementById('activity-feed');
+  if (!feed) return;
+
+  if (!data || data.length === 0) {
+    feed.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:1.5rem;">No recent activity. <a href="upload.html" style="color:var(--teal);">Upload evidence</a> to get started.</div>';
+    return;
+  }
+
+  // Take the most recent 5 items
+  const recent = data.slice(0, 5);
+  feed.innerHTML = '';
+
+  recent.forEach((item, idx) => {
+    const isLast = idx === recent.length - 1;
+    let badge = '';
+    let text = '';
+
+    if (item.status === 'analyzed' && item.confidence !== null) {
+      badge = '<span class="badge badge-success">✓ Analyzed</span>';
+      text = `Evidence #${item.id} analyzed — ${item.confidence > 55 ? 'Distress detected' : 'No distress'} (${item.confidence}% confidence)`;
+    } else if (item.status === 'analyzed') {
+      badge = '<span class="badge badge-success">✓ Analyzed</span>';
+      text = `Evidence #${item.id} analyzed`;
+    } else {
+      badge = '<span class="badge badge-info">📤 Uploaded</span>';
+      text = `New evidence submitted${item.location && item.location !== 'Unknown' ? ' from ' + item.location : ''} — ${item.id}`;
+    }
+
+    const timeAgo = getTimeAgo(item.timestamp);
+
+    const div = document.createElement('div');
+    div.style.cssText = `display:flex;gap:1rem;padding:0.75rem 0;align-items:center;${!isLast ? 'border-bottom:1px solid var(--border-color);' : ''}`;
+    div.innerHTML = `
+      ${badge}
+      <span style="font-size:0.9rem;">${text}</span>
+      <span style="margin-left:auto;font-size:0.8rem;color:var(--text-muted);font-family:var(--font-mono);">${timeAgo}</span>
+    `;
+    feed.appendChild(div);
+  });
+}
+
+function getTimeAgo(timestamp) {
+  if (!timestamp) return '';
+  try {
+    const diff = Date.now() - new Date(timestamp).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins} min ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours} hr ago`;
+    const days = Math.floor(hours / 24);
+    return `${days} day${days > 1 ? 's' : ''} ago`;
+  } catch {
+    return '';
+  }
 }
 
 // ========== Dashboard: Update Stats ==========
@@ -387,7 +448,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Incident page init
   if (document.getElementById('btn-analyze-ai')) {
-    const evidenceId = getUrlParam('id') || 'EVD-005';
+    const evidenceId = getUrlParam('id');
+    
+    if (!evidenceId) {
+      // No evidence ID provided — show helpful message
+      const idDisplay = document.getElementById('evidence-id-display');
+      if (idDisplay) idDisplay.textContent = 'No evidence selected';
+      const summaryEl = document.getElementById('ai-summary-text');
+      if (summaryEl) summaryEl.textContent = 'No evidence ID provided. Please select an evidence record from the Dashboard or upload new evidence.';
+      document.getElementById('btn-analyze-ai').disabled = true;
+      showToast('No evidence ID in URL. Go to Dashboard to select an evidence record.', 'warning');
+      return;
+    }
     
     // Load real data from backend
     loadIncidentDetail(evidenceId);

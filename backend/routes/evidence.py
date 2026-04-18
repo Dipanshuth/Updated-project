@@ -44,7 +44,7 @@ async def upload_evidence(
             latitude=latitude,
             longitude=longitude,
             status="pending",
-            created_at=datetime.utcnow().isoformat(),
+            created_at=datetime.utcnow().isoformat() + "Z",
         )
         db.add(evidence)
         db.commit()
@@ -175,7 +175,7 @@ async def get_timeline(evidence_id: str):
         
         confidence_pct = int((record.confidence or 0) * 100)
         distress_info = get_distress_info(record.confidence or 0)
-        created = record.created_at or datetime.utcnow().isoformat()
+        created = record.created_at or (datetime.utcnow().isoformat() + "Z")
         
         return {
             "evidence_id": evidence_id,
@@ -230,7 +230,7 @@ async def get_report(evidence_id: str):
             return {
                 "evidence_id": evidence_id,
                 "fir_number": f"FIR/2026/NCR/{abs(hash(evidence_id)) % 100000:05d}",
-                "generated_at": datetime.utcnow().isoformat(),
+                "generated_at": datetime.utcnow().isoformat() + "Z",
                 "station": "Connaught Place PS, New Delhi",
                 "district": "New Delhi",
                 "incident_datetime": record.incident_datetime or "Unknown",
@@ -250,7 +250,7 @@ async def get_report(evidence_id: str):
     return {
         "evidence_id": evidence_id,
         "fir_number": f"FIR/2026/NCR/{abs(hash(evidence_id)) % 100000:05d}",
-        "generated_at": datetime.utcnow().isoformat(),
+        "generated_at": datetime.utcnow().isoformat() + "Z",
         "station": "Connaught Place PS, New Delhi",
         "district": "New Delhi",
         "incident_datetime": "Unknown",
@@ -289,7 +289,7 @@ async def compute_hash(evidence_id: str):
         "hash": "N/A",
         "blockchain_anchored": False,
         "block_number": 0,
-        "anchored_at": datetime.utcnow().isoformat(),
+        "anchored_at": datetime.utcnow().isoformat() + "Z",
     }
 
 

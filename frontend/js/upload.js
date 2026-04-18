@@ -3,7 +3,7 @@
  * Features: MediaRecorder API, Waveform Visualization, File Upload, GPS Capture
  */
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = `http://${window.location.hostname || 'localhost'}:8000`;
 
 // ========== State ==========
 let mediaRecorder = null;
@@ -313,6 +313,23 @@ function setupGPS() {
   });
 }
 
+// ========== Backend Connection Check ==========
+async function checkBackendConnection() {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const response = await fetch(`${API_BASE}/health`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (response.ok) {
+      const data = await response.json();
+      return data.status === 'active';
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
 // ========== Form Submission ==========
 function setupFormSubmission() {
   const form = document.getElementById('evidence-form');
@@ -323,6 +340,17 @@ function setupFormSubmission() {
 
     const submitBtn = document.getElementById('btn-submit-evidence');
     submitBtn.disabled = true;
+    submitBtn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Checking connection...';
+
+    // Pre-check: Is the backend running?
+    const backendAlive = await checkBackendConnection();
+    if (!backendAlive) {
+      showToast('Cannot connect to backend server. Please start it first: cd backend && py -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload', 'error');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '🚀 Submit Evidence';
+      return;
+    }
+
     submitBtn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Uploading...';
 
     const formData = new FormData();
@@ -372,7 +400,11 @@ function setupFormSubmission() {
         }, 1500);
         return;
       }
-      throw new Error('Upload failed');
+
+      // Handle non-OK responses
+      const errorText = await response.text();
+      console.error('Server error:', response.status, errorText);
+      showToast(`Upload failed (HTTP ${response.status}). ${errorText}`, 'error');
     } catch (err) {
       console.error('Upload error:', err);
       showToast('Upload failed. Please ensure the backend server is running on localhost:8000.', 'error');
@@ -431,7 +463,7 @@ function setupReset() {
 }
 
 // ========== Init ==========
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Mic button
   const micBtn = document.getElementById('mic-button');
   if (micBtn) {
@@ -464,10 +496,12 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Recording cleared', 'info');
   });
 
-  // Set default datetime
+  // Set default datetime to local time
   const dtInput = document.getElementById('incident-datetime');
   if (dtInput) {
     const now = new Date();
+    // Offset by timezone so toISOString gives local time string
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     dtInput.value = now.toISOString().slice(0, 16);
   }
 
@@ -491,6 +525,14 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.moveTo(0, canvas.height / 2);
     ctx.lineTo(canvas.width, canvas.height / 2);
     ctx.stroke();
+  }
+
+  // Check backend connection on page load
+  const backendAlive = await checkBackendConnection();
+  if (backendAlive) {
+    showToast('Connected to backend server ✓', 'success');
+  } else {
+    showToast('⚠️ Backend server not detected. Start it before submitting: cd backend && py -m uvicorn main:app --port 8000', 'warning');
   }
 
   console.log('🎙️ Upload module loaded');

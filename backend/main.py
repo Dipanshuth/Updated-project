@@ -9,6 +9,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 import uvicorn
 import os
+import sys
+
+# Ensure backend directory is on sys.path so relative imports always work
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+if BACKEND_DIR not in sys.path:
+    sys.path.insert(0, BACKEND_DIR)
 
 from models import Base, engine
 
@@ -16,7 +22,7 @@ from models import Base, engine
 Base.metadata.create_all(bind=engine)
 
 # Create uploads directory
-os.makedirs("uploads", exist_ok=True)
+os.makedirs(os.path.join(BACKEND_DIR, "uploads"), exist_ok=True)
 
 app = FastAPI(
     title="AI Digital Memory Vault",
@@ -24,18 +30,21 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# CORS — Allow frontend to connect
+# CORS — Allow frontend to connect (from any origin, including file:// and localhost)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Serve uploaded files
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+uploads_path = os.path.join(BACKEND_DIR, "uploads")
+os.makedirs(uploads_path, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 
+# Import route modules
 from routes import auth, evidence, alerts
 
 # New Modular Pipeline Routers
@@ -77,16 +86,39 @@ async def api_info():
             "POST /evidence/{id}/hash",
             "GET  /evidence/list",
             "POST /alerts/send",
+            "POST /detect-trigger",
+            "POST /detect-trigger-audio",
+            "POST /upload-evidence",
+            "POST /run-inference",
+            "GET  /generate-timeline",
+            "GET  /generate-report",
+            "GET  /verify-integrity",
         ]
     }
 
 # ==================== FRONTEND STATIC FILES ====================
 # IMPORTANT: This must come LAST — after all API routes are registered
 # Otherwise it shadows the API endpoints
-import os
-frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
+frontend_path = os.path.normpath(os.path.join(BACKEND_DIR, "..", "frontend"))
 if os.path.exists(frontend_path):
     app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+
+# ==================== STARTUP EVENT ====================
+
+@app.on_event("startup")
+async def startup_event():
+    print("\n" + "=" * 60)
+    print("  AI Digital Memory Vault -- Backend Server")
+    print("=" * 60)
+    print(f"  Backend dir:  {BACKEND_DIR}")
+    print(f"  Frontend dir: {frontend_path}")
+    print(f"  Database:     {os.path.join(BACKEND_DIR, 'memory_vault.db')}")
+    print(f"  Uploads dir:  {uploads_path}")
+    print("=" * 60)
+    print("  [OK] Server is ready!")
+    print("  URL: http://localhost:8000")
+    print("  API docs: http://localhost:8000/docs")
+    print("=" * 60 + "\n")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

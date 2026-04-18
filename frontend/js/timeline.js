@@ -76,7 +76,7 @@ function renderTimeline(container, events) {
 
 // ========== Fetch Timeline from Backend ==========
 async function fetchTimeline(evidenceId) {
-  const API_BASE = 'http://localhost:8000';
+  const API_BASE = `http://${window.location.hostname || 'localhost'}:8000`;
 
   try {
     const response = await fetch(`${API_BASE}/evidence/${evidenceId}/timeline`);
@@ -98,7 +98,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Get evidence ID from URL
   const params = new URLSearchParams(window.location.search);
-  const evidenceId = params.get('id') || 'EVD-005';
+  const evidenceId = params.get('id');
+
+  if (!evidenceId) {
+    timelineContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:2rem;">No evidence selected. Please choose an evidence record from the Dashboard.</div>';
+    return;
+  }
 
   // Fetch and render timeline
   const events = await fetchTimeline(evidenceId);

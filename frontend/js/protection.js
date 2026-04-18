@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000';
+const API_BASE = `http://${window.location.hostname || 'localhost'}:8000`;
 
 function updateStep(stepId, state) {
   const el = document.getElementById(stepId);
@@ -150,13 +150,28 @@ async function startDemoPipeline() {
   document.getElementById('results-panel').style.display = 'none';
 
   // State: Triggered
-  updateVisual('processing', 'Initiating Pipeline...', 'Preparing distress detection system');
+  updateVisual('processing', 'Initiating Pipeline...', 'Checking backend connection...');
   updateStep('step-detect', 'active');
   
   let evidenceId = null;
   let analysisResult = null;
 
   try {
+    // Pre-flight: Check backend is reachable
+    try {
+      const healthCheck = await fetch(`${API_BASE}/health`, {
+        signal: AbortSignal.timeout(3000)
+      });
+      if (!healthCheck.ok) throw new Error('Backend not healthy');
+    } catch (connErr) {
+      updateVisual('processing', 'Backend Not Running', 'Start the backend: cd backend && py -m uvicorn main:app --port 8000');
+      document.getElementById('btn-trigger-demo').innerText = '⚠️ Start Backend First';
+      document.getElementById('btn-trigger-demo').disabled = false;
+      return;
+    }
+
+    updateVisual('processing', 'Initiating Pipeline...', 'Preparing distress detection system');
+
     // 1. Detect Trigger (initial acknowledgement)
     const detectRes = await fetch(`${API_BASE}/detect-trigger`, {
       method: 'POST',
